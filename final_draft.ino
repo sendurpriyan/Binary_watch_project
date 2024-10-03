@@ -34,8 +34,6 @@ int red = 255;
 int green = 0;
 int blue = 0;
 
-bool hasBeenReprogrammed;
-
 time_t now;
 struct tm timeinfo;
 
@@ -66,16 +64,6 @@ void setup() {
     configTime(0, 0, "pool.ntp.org");
   }
 
-  // Load "hasReprogrammed" status and password from preferences
-  hasBeenReprogrammed = preferences.getBool("hasReprogrammed", false);
-  current_password = preferences.getString("password", default_password);
-
-  // If the device has not been reprogrammed, reset the password to default
-  if (!hasBeenReprogrammed) {
-    preferences.putString("password", default_password);
-    preferences.putBool("hasReprogrammed", true);  // Mark the device as reprogrammed
-    current_password = default_password;  // Set the current password to default
-  }
 
   // Initialize the RTC data
   rtcData.red = preferences.getUInt("red", 255);     // Get stored red value
@@ -116,7 +104,7 @@ void setup() {
           <h1>Change Password</h1>
           <form action="/change_password" method="GET">
             <label for="new_password">New Password:</label>
-            <input type="password" id="new_password" name="new_password" required>
+            <input type="password" id="new_password" name="new_password" required minlength="8" title="Password must be at least 8 characters long">
             <button type="submit">Change Password</button>
           </form>
         </body>
@@ -138,8 +126,9 @@ void setup() {
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            height: 100%;
             color: #fff;
+            flex-direction: column;
           }
           h1 {
             text-align: center;
@@ -155,10 +144,13 @@ void setup() {
 
           .container {
             max-width: 600px;
+            max-height: 100vh;
             width: 100%;
             background: #f4f4f4;
             border-radius: 10px;
             padding: 30px;
+            box-sizing: border-box;
+            overflow-y: auto;
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
             text-align: center;
             color: #333;
@@ -187,7 +179,7 @@ void setup() {
             background: #ff4757;
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 10px 10px;
             border-radius: 5px;
             cursor: pointer;
             font-size: 0.9rem;
@@ -382,7 +374,7 @@ void setup() {
           <h1>ESP32 Binary Clock</h1>
           <form action="/change_password" method="GET">
             <div class="password-reset">
-              <input type="password" id="new_password" name="new_password" placeholder="Enter Current Password" required>
+              <input type="password" id="new_password" name="new_password" placeholder="Enter Current Password" required minlength="8" title="Password must be at least 8 characters long">
               <button type="submit">Change Password</button>
             </div>
           </form>
