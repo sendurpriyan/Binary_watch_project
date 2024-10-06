@@ -43,8 +43,8 @@ void setup() {
 
   Serial.begin(115200);
 
-      // Serial.begin(115200);
-    Serial.println("Starting setup...");
+  // Serial.begin(115200);
+  Serial.println("Starting setup...");
 
   // FastLED.addLeds<WS2812B, LED_PIN, GRB>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
   // FastLED.clear();
@@ -67,7 +67,10 @@ void setup() {
     settimeofday(&tv, nullptr);
 
   } else {
-    configTime(0, 0, "pool.ntp.org");
+    // Serial.begin(115200);
+    Serial.println("No time is set");
+    //Umair: we don't have internet, so diabling this
+    //configTime(0, 0, "pool.ntp.org");
   }
 
 
@@ -455,25 +458,59 @@ void setup() {
     request->send(200, "text/html", html);
   });
 
+  //Umair: diabling device restarting at password reset
+  // server.on("/change_password", HTTP_GET, [](AsyncWebServerRequest *request) {
+  //   if (request->hasParam("new_password")) {
+  //     String new_password = request->getParam("new_password")->value();
+
+  //     // Update the current password and store it in preferences
+  //     current_password = new_password;
+  //     preferences.putString("password", current_password);
+  //     preferences.putBool("hasReprogrammed", true);  // Mark as reprogrammed to avoid resetting on reboot
+  //     preferences.end();                             // Ensure changes are written to NVS
+
+  //     // Restart Wi-Fi AP with the new password
+  //     WiFi.softAP(default_ssid, current_password.c_str());
+  //     String response = "<html><head><script>window.location.href='http://192.168.4.1/';</script></head><body></body></html>";
+  //     request->send(200, "text/html", response);
+
+  //   } else {
+  //     request->send(400, "text/plain", "Missing password parameter!");
+  //   }
+  // });
+
+  // Callback for changing the password
   server.on("/change_password", HTTP_GET, [](AsyncWebServerRequest *request) {
     if (request->hasParam("new_password")) {
       String new_password = request->getParam("new_password")->value();
 
-      // Update the current password and store it in preferences
+      // Save the new password to preferences
+      preferences.putString("password", new_password);
+
+      // Set the current password variable
       current_password = new_password;
-      preferences.putString("password", current_password);
-      preferences.putBool("hasReprogrammed", true);  // Mark as reprogrammed to avoid resetting on reboot
-      preferences.end();                             // Ensure changes are written to NVS
 
-      // Restart Wi-Fi AP with the new password
-      WiFi.softAP(default_ssid, current_password.c_str());
-      String response = "<html><head><script>window.location.href='http://192.168.4.1/';</script></head><body></body></html>";
+      // // Disconnect the current Access Point
+      // WiFi.softAPdisconnect(true);  // true means shutdown the AP completely
+
+      // // Restart the WiFi Access Point with the new password
+      // delay(1000);  // Small delay to ensure disconnect completes
+      // WiFi.softAP(ssid.c_str(), current_password.c_str());
+
+      // IPAddress IP = WiFi.softAPIP();
+      // Serial.print("New AP IP address: ");
+      // Serial.println(IP);
+
+      // Send response to user that the password has been changed
+      String response = "<html><body><h1>Password Changed Successfully!</h1>";
+      // response += "<p>The new password is: " + new_password + "</p>";
+      response += "<p>Reconnect using the new password.</p></body></html>";
       request->send(200, "text/html", response);
-
     } else {
-      request->send(400, "text/plain", "Missing password parameter!");
+      request->send(400, "text/html", "No new password provided!");
     }
   });
+
 
 
 
@@ -578,37 +615,37 @@ void setup() {
 // }
 
 void loop() {
-    static unsigned long lastUpdateTime = 0; // Store the last update time
-    unsigned long currentMillis = millis(); // Get the current time in milliseconds
+  static unsigned long lastUpdateTime = 0;  // Store the last update time
+  unsigned long currentMillis = millis();   // Get the current time in milliseconds
 
-    // Check if 1 second has passed since the last update
-    if (currentMillis - lastUpdateTime >= 1000) {
-        lastUpdateTime = currentMillis; // Update the last update time
+  // Check if 1 second has passed since the last update
+  if (currentMillis - lastUpdateTime >= 1000) {
+    lastUpdateTime = currentMillis;  // Update the last update time
 
-        // Get the current time
-        time(&now);
-        localtime_r(&now, &timeinfo);
+    // Get the current time
+    time(&now);
+    localtime_r(&now, &timeinfo);
 
-        // Print individual binary representations of each digit
-        int hours = rtcData.timeinfo.tm_hour;
-        int minutes = rtcData.timeinfo.tm_min;
+    // Print individual binary representations of each digit
+    int hours = rtcData.timeinfo.tm_hour;
+    int minutes = rtcData.timeinfo.tm_min;
 
-        // Convert time to BCD
-        uint16_t bcdTime = convertTimeToBCD(hours, minutes);
+    // Convert time to BCD
+    uint16_t bcdTime = convertTimeToBCD(hours, minutes);
 
-        // Update the WS2812B LEDs with the current time
-        // updateLEDs(bcdTime, rtcData.red, rtcData.green, rtcData.blue);
+    // Update the WS2812B LEDs with the current time
+    // updateLEDs(bcdTime, rtcData.red, rtcData.green, rtcData.blue);
 
-        // Debug print statements (optional)
-        Serial.print("Time (HH:MM): ");
-        Serial.print(hours);
-        Serial.print(":");
-        Serial.println(minutes);
-        Serial.print("BCD Time: ");
-        Serial.println(bcdTime, BIN); // Print BCD in binary format
-    }
+    // Debug print statements (optional)
+    Serial.print("Time (HH:MM): ");
+    Serial.print(hours);
+    Serial.print(":");
+    Serial.println(minutes);
+    Serial.print("BCD Time: ");
+    Serial.println(bcdTime, BIN);  // Print BCD in binary format
+  }
 
-    // Other tasks can be performed here without blocking
+  // Other tasks can be performed here without blocking
 }
 
 
