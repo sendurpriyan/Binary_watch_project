@@ -21,7 +21,6 @@ This project is a custom binary wristwatch powered by an **ESP32 microcontroller
 
 ---
 
-## Folder Structure
 ## Project Folder Structure
 
 ```text
@@ -45,3 +44,42 @@ Binary-Watch-Project/
 ├─ README.md
 └─ LICENSE
 
+```
+---
+
+## Hardware Components
+- ESP32-WROOM microcontroller
+- WS2812B Neopixel LEDs
+- Custom-designed PCB
+- Power supply and connectors
+
+---
+
+## Software / Firmware
+- Embedded C/C++ for ESP32
+- Arduino IDE compatible
+- Web server integration for BLE/Wi-Fi configuration
+
+---
+
+## Usage Instructions
+1. Flash the firmware (`.ino` files) to the ESP32 using Arduino IDE.  
+2. Connect the WS2812B LEDs to the ESP32 according to the schematic.  
+3. Power up the device.  
+4. Access the ESP32 web server via Wi-Fi to configure LED colors, brightness, and time format.  
+5. The binary time will be displayed on the Neopixel LEDs in real time.  
+
+---
+
+## Demo / Media
+*(Optional: Add images, GIFs, or videos here to showcase the working watch)*
+
+---
+
+## License
+This project is open-source and licensed under the [MIT License](LICENSE).
+
+---
+
+**Author:** Sendurpriyan K  
+**Role:** Freelance Embedded Systems Engineer
