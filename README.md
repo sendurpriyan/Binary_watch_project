@@ -45,7 +45,3 @@ Binary-Watch-Project/
 ├─ README.md
 └─ LICENSE
 
-|       flow_chart.pdf
-|       
-\---Webinterface
-        test.html
