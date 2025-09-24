@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>ESP32 Time Sync</title>
+        <style>
+          body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #6B73FF 0%, #000DFF 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            color: #fff;
+            flex-direction: column;
+          }
+          h1 {
+            text-align: center;
+            color: #000000;
+            margin-bottom: 20px;
+          }
+
+          #timeFormatSelect {
+                  width: 200px;
+                  padding: 5px;
+                  font-size: 16px;
+              }
+
+          .container {
+            max-width: 600px;
+            max-height: 100vh;
+            width: 100%;
+            background: #f4f4f4;
+            border-radius: 10px;
+            padding: 30px;
+            box-sizing: border-box;
+            overflow-y: auto;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            color: #333;
+            position: relative;
+          }
+
+          .password-reset {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+          }
+
+          .password-reset input {
+            flex: 1;
+            padding: 10px;
+            margin-right: 10px;
+            margin-top: 20px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            box-sizing: border-box;
+            font-size: 1rem;
+            height: 40px; /* Set a fixed height for the input */
+          }
+
+          .password-reset button {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 10px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            height: 40px; /* Set the same height for the button */
+            transition: background 0.3s ease;
+          }
+
+          .password-reset button:hover {
+            background-color: #e84118;
+          }
+
+          label {
+            display: block;
+            margin-top: 20px;
+            font-weight: bold;
+            color: #333;
+          }
+
+          input[type=range], input[type=time] {
+            width: 100%;
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            box-sizing: border-box;
+            font-size: 1rem;
+          }
+
+          .color-preview {
+            width: 100px;
+            height: 100px;
+            margin-top: 20px;
+            border: 3px solid #ddd;
+            border-radius: 50%;
+            transition: background-color 0.3s ease;
+          }
+
+          .flex-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-top: 10px;
+          }
+
+          button {
+            width: 100%;
+            margin-top: 20px;
+            padding: 15px;
+            background: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
+          }
+
+          button:hover {
+            background-color: #0056b3;
+          }
+
+          p {
+            margin: 20px 0;
+            font-size: 1.2rem;
+            color: #333;
+          }
+
+          .current-time {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #333;
+            font-weight: bold;
+          }
+
+          /* Modal Styles */
+          .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+          }
+
+          .modal {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+            z-index: 2;
+          }
+
+          .modal label {
+            color: #333;
+          }
+
+          .modal button {
+            background: #ff4757;
+            border: none;
+            padding: 10px 15px;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+          }
+
+          .modal button:hover {
+            background-color: #e84118;
+          }
+
+          .blurred {
+            filter: blur(5px);
+          }
+
+          @media (max-width: 600px) {
+            .container {
+              padding: 20px;
+            }
+            input[type=range] {
+              width: 80%;
+            }
+            .flex-row {
+              flex-direction: column;
+              align-items: flex-start;
+            }
+          }
+        </style>
+        <script>
+          // Sync device time with system time
+          function syncDeviceTime() {
+            var currentDate = new Date();
+            var hours = currentDate.getHours().toString().padStart(2, '0');
+            var minutes = currentDate.getMinutes().toString().padStart(2, '0');
+            var time = hours + ":" + minutes;
+            document.getElementById('time').value = time;
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', '/update?time=' + time, true);
+            xhr.send();
+          }
+
+          // Update time and color
+          function updateTime() {
+            var xhr = new XMLHttpRequest();
+            var time = document.getElementById('time').value;
+            var red = document.getElementById('red').value;
+            var green = document.getElementById('green').value;
+            var blue = document.getElementById('blue').value;
+            var timeFormat = document.getElementById('timeFormatSelect').value;
+            xhr.open('GET', '/update?time=' + time + '&r=' + red + '&g=' + green + '&b=' + blue + '&t_format=' + timeFormat, true);
+            xhr.send();
+          }
+
+          // Update brightness
+          function updateBrightness() {
+            var brightness = document.getElementById('brightness').value;
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', '/update_brightness?brightness=' + brightness, true);
+            xhr.send();
+          }
+
+
+          // Preview LED color based on RGB values
+          function updateColorPreview() {
+            var red = document.getElementById('red').value;
+            var green = document.getElementById('green').value;
+            var blue = document.getElementById('blue').value;
+            document.getElementById('colorPreview').style.backgroundColor = 'rgb(' + red + ',' + green + ',' + blue + ')';
+          }
+
+          // Real-time clock sync
+          setInterval(function() {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', '/gettime', true);
+            xhr.onreadystatechange = function() {
+              if (xhr.readyState == 4 && xhr.status == 200) {
+                document.getElementById('currentTime').innerHTML = xhr.responseText;
+              }
+            };
+            xhr.send();
+          }, 1000);
+
+        </script>
+      </head>
+      <body>
+        <div class="container">
+          <h1>ESP32 Binary Clock</h1>
+          <form action="/change_password" method="GET">
+            <div class="password-reset">
+              <input type="password" id="new_password" name="new_password" placeholder="Enter Current Password" required minlength="8" title="Password must be at least 8 characters long">
+              <button type="submit">Change Password</button>
+            </div>
+          </form>
+
+          <div class="current-time">
+            Current Time: <span id="currentTime">00:00</span>
+          </div>
+
+          <h3>Set Time</h3>
+          <button onclick="syncDeviceTime()">Sync with Device Time</button><br><br>
+          <label for="time">Set Time Manually (HH:MM):</label>
+          <input type="time" id="time" name="time">
+
+          <h2>Select Time Format</h2>
+          <label for="timeFormatSelect">Choose Time Format:</label>
+          <select id="timeFormatSelect">
+            <option value="24">24-hour</option>
+            <option value="12">12-hour</option>
+          </select>
+
+          <h3>Set LED Color (RGB)</h3>
+          <div class="flex-row">
+            <label for="red">Red:</label>
+            <input type="range" id="red" name="red" min="0" max="255" oninput="updateColorPreview()">
+          </div>
+          <div class="flex-row">
+            <label for="green">Green:</label>
+            <input type="range" id="green" name="green" min="0" max="255" oninput="updateColorPreview()">
+          </div>
+          <div class="flex-row">
+            <label for="blue">Blue:</label>
+            <input type="range" id="blue" name="blue" min="0" max="255" oninput="updateColorPreview()">
+          </div>
+
+          <div id="colorPreview" class="color-preview"></div>
+
+          <h3>Adjust LED Brightness</h3>
+          <div class="flex-row">
+            <label for="brightness">Brightness:</label>
+            <input type="range" id="brightness" name="brightness" min="0" max="255" value="255" oninput="updateBrightness()">
+          </div>
+
+          <button onclick="updateTime()">Update Time and Color</button>
+        </div>
+      </body>
+      </html>
