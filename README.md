@@ -22,3 +22,22 @@ This project is a custom binary wristwatch powered by an **ESP32 microcontroller
 ---
 
 ## Folder Structure
+Binary-Watch-Project/
+│
+├─ Firmware/ # Embedded C/C++ code for ESP32
+│ ├─ binary_watch.ino
+│ ├─ bw_u.ino
+│ └─ final_draft.ino
+│
+├─ Hardware/ # Schematics and PCB files
+│ ├─ flow_chart.docx
+│ └─ flow_chart.pdf
+│
+├─ Docs/ # Images, diagrams, demo videos
+│ └─ (add screenshots, photos, GIFs here)
+│
+├─ WebInterface/ # Web server or configuration files
+│ └─ (HTML/CSS/JS or ESP32 web server scripts)
+│
+├─ README.md
+└─ LICENSE
