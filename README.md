@@ -22,19 +22,29 @@ This project is a custom binary wristwatch powered by an **ESP32 microcontroller
 ---
 
 ## Folder Structure
-|   folder_structure.txt
-|   
-+---Docs
-|       WhatsApp Image 2024-09-12 at 21.34.10_80cf5483.jpg
-|       WhatsApp Video 2024-09-12 at 21.29.38_e1665a54.mp4
-|       
-+---Firmware
-|       binary_watch.ino
-|       bw_u.ino
-|       final_draft.ino
-|       
-+---Hardware
-|       BinaryWatch - firmware requirements.pdf
+## Project Folder Structure
+
+```text
+Binary-Watch-Project/
+│
+├─ Firmware/        # Embedded C/C++ code for ESP32
+│  ├─ binary_watch.ino
+│  ├─ bw_u.ino
+│  └─ final_draft.ino
+│
+├─ Hardware/        # Schematics and PCB files
+│  ├─ flow_chart.docx
+│  └─ flow_chart.pdf
+│
+├─ Docs/            # Images, diagrams, demo videos
+│  └─ (add screenshots, photos, GIFs here)
+│
+├─ WebInterface/    # Web server or configuration files
+│  └─ (HTML/CSS/JS or ESP32 web server scripts)
+│
+├─ README.md
+└─ LICENSE
+
 |       flow_chart.pdf
 |       
 \---Webinterface
